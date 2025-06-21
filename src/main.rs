@@ -16,6 +16,8 @@ fn main() {
     link_patches();
     EspLogger::initialize_default();
 
+    // Setup i2c Driver with config
+    // https://heltec.org/project/wifi-lora-32-v3/
     let peripherals = Peripherals::take().unwrap();
     let config = I2cConfig::new().baudrate(400.kHz().into());
     let i2c = I2cDriver::new(
@@ -25,7 +27,7 @@ fn main() {
         &config,
     ).unwrap();
 
-    // Hardware reset pin for display
+    // Hardware reset pin to prepare display
     let mut rst = PinDriver::output(peripherals.pins.gpio21).unwrap();
     rst.set_low().unwrap();
     std::thread::sleep(std::time::Duration::from_millis(10));
@@ -39,14 +41,22 @@ fn main() {
     display.clear(BinaryColor::Off).unwrap();
 
     let style = MonoTextStyle::new(&FONT_6X10, BinaryColor::On);
-    Text::new("Hello, world!", Point::new(0, 16), style)
-        .draw(&mut display)
-        .unwrap();
-
-    display.flush().unwrap();
 
     loop {
-        std::thread::sleep(std::time::Duration::from_secs(1));
+        Text::new("Hello, world!", Point::new(0, 16), style)
+            .draw(&mut display)
+            .unwrap();
+
+        display.flush().unwrap();
+        display.clear(BinaryColor::Off).unwrap();
+        std::thread::sleep(std::time::Duration::from_secs(2));
+
+        Text::new("How are ya?", Point::new(0, 16), style)
+            .draw(&mut display)
+            .unwrap();
+
+        display.flush().unwrap();
+        display.clear(BinaryColor::Off).unwrap();
+        std::thread::sleep(std::time::Duration::from_secs(2));
     }
 }
-
